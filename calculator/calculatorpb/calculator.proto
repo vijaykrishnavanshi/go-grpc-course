@@ -3,4 +3,19 @@ syntax = "proto3";
 package calculator;
 option go_package="calculatorpb";
 
-service CalculatorService {};
+message SumInput {
+    int32 firstNum = 1;
+    int32 secondNum = 2;
+}
+
+message SumRequest {
+    SumInput input = 1;
+}
+
+message SumResponse {
+    int32 result = 1;
+}
+
+service CalculatorService {
+    rpc Sum(SumRequest) returns (SumResponse) {};
+};

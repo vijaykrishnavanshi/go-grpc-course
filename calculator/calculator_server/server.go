@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
@@ -10,6 +11,19 @@ import (
 )
 
 type server struct{}
+
+func (*server) Sum(ctx context.Context, req *calculatorpb.SumRequest) (*calculatorpb.SumResponse, error) {
+	fmt.Printf("Greet funxtion was invoked with %v\n", req)
+	firstNum := req.GetInput().GetFirstNum()
+	secondNum := req.GetInput().GetSecondNum()
+	fmt.Printf("First Num: %v", firstNum)
+	fmt.Printf("Second Num: %v", secondNum)
+	result := firstNum + secondNum
+	res := &calculatorpb.SumResponse{
+		Result: result,
+	}
+	return res, nil
+}
 
 func main() {
 	fmt.Println("Hello")
