@@ -61,30 +61,16 @@ func doServerStreaming(c calculatorpb.CalculatorServiceClient) {
 }
 
 func doClientStreaming(c calculatorpb.CalculatorServiceClient) {
-	requests := []*calculatorpb.ComputeAverageRequest{
-		&calculatorpb.ComputeAverageRequest{
-			Number: 120,
-		},
-		&calculatorpb.ComputeAverageRequest{
-			Number: 130,
-		},
-		&calculatorpb.ComputeAverageRequest{
-			Number: 1,
-		},
-		&calculatorpb.ComputeAverageRequest{
-			Number: 191,
-		},
-		&calculatorpb.ComputeAverageRequest{
-			Number: 120,
-		},
-	}
+	numbers := []int64{120, 233, 343, 4344, 3443}
 	resStream, err := c.ComputeAverage(context.Background())
 	if err != nil {
 		log.Fatalf("Unable to call: %v", err)
 	}
-	for _, req := range requests {
-		log.Printf("Sending Client Request: %v", req)
-		resStream.Send(req)
+	for _, number := range numbers {
+		log.Printf("Sending Client Request: %v", number)
+		resStream.Send(&calculatorpb.ComputeAverageRequest{
+			Number: number,
+		})
 		time.Sleep(1000 * time.Millisecond)
 	}
 	msg, err := resStream.CloseAndRecv()
