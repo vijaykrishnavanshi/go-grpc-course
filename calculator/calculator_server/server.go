@@ -56,7 +56,7 @@ func (*server) ComputeAverage(stream calculatorpb.CalculatorService_ComputeAvera
 	for {
 		msg, err := stream.Recv()
 		if err == io.EOF {
-			average := sum / numbersCount
+			average := float64(sum) / float64(numbersCount)
 			log.Printf("Average: %v", average)
 			return stream.SendAndClose(&calculatorpb.ComputeAverageResponse{
 				Average: average,
