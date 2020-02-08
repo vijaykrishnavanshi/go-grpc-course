@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net"
 	"time"
 
@@ -67,6 +68,32 @@ func (*server) ComputeAverage(stream calculatorpb.CalculatorService_ComputeAvera
 		}
 		sum += msg.GetNumber()
 		numbersCount++
+	}
+}
+
+func (*server) FindMaximum(stream calculatorpb.CalculatorService_FindMaximumServer) error {
+	fmt.Printf("Greet funxtion was invoked with client stream\n")
+	max := int64(math.MinInt64)
+	for {
+		req, err := stream.Recv()
+		fmt.Printf("Message Recieved: %v\n", req)
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			log.Fatalf("Error in client streaming: %v", err)
+			return err
+		}
+		if max < req.GetNumber() {
+			max = req.GetNumber()
+		}
+		errorInSend := stream.Send(&calculatorpb.FindMaximumResponse{
+			Maximum: max,
+		})
+		if errorInSend != nil {
+			log.Fatalf("Error in client streaming: %v", errorInSend)
+			return errorInSend
+		}
 	}
 }
 
