@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"time"
 
 	"github.com/vijaykrishnavanshi/go-grpc-course/calculator/calculatorpb"
 	"google.golang.org/grpc"
@@ -19,7 +20,9 @@ func main() {
 	fmt.Printf("Connection Created: %v", cc)
 	defer cc.Close()
 	c := calculatorpb.NewCalculatorServiceClient(cc)
-	doServerStreaming(c)
+	// doUnary(c)
+	// doServerStreaming(c)
+	doClientStreaming(c)
 }
 
 func doUnary(c calculatorpb.CalculatorServiceClient) {
@@ -55,4 +58,38 @@ func doServerStreaming(c calculatorpb.CalculatorServiceClient) {
 		}
 		log.Printf("Streamed Value: %v", msg.GetFactor())
 	}
+}
+
+func doClientStreaming(c calculatorpb.CalculatorServiceClient) {
+	requests := []*calculatorpb.ComputeAverageRequest{
+		&calculatorpb.ComputeAverageRequest{
+			Number: 120,
+		},
+		&calculatorpb.ComputeAverageRequest{
+			Number: 130,
+		},
+		&calculatorpb.ComputeAverageRequest{
+			Number: 1,
+		},
+		&calculatorpb.ComputeAverageRequest{
+			Number: 191,
+		},
+		&calculatorpb.ComputeAverageRequest{
+			Number: 120,
+		},
+	}
+	resStream, err := c.ComputeAverage(context.Background())
+	if err != nil {
+		log.Fatalf("Unable to call: %v", err)
+	}
+	for _, req := range requests {
+		log.Printf("Sending Client Request: %v", req)
+		resStream.Send(req)
+		time.Sleep(1000 * time.Millisecond)
+	}
+	msg, err := resStream.CloseAndRecv()
+	if err != nil {
+		log.Fatalf("Unable to call: %v", err)
+	}
+	log.Printf("Average: %v", msg.Average)
 }
