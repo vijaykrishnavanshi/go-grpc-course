@@ -30,7 +30,7 @@ func (*server) PrimeDecomposition(req *calculatorpb.PrimeDecompositionRequest, s
 	fmt.Printf("Greet funxtion was invoked with %v\n", req)
 	number := req.GetNumber()
 	fmt.Printf("Number: %v\n", number)
-	var k int32
+	var k int64
 	k = 2
 	for number > 1 {
 		if number%k == 0 {
